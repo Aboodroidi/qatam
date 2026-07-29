@@ -244,7 +244,8 @@
     const main = el("div", "receipt-main");
     const top = el("div", "receipt-top");
     const cat = el("span", "receipt-cat"); cat.textContent = categoryName(r.category);
-    top.append(cat);
+    const dt = el("span", "receipt-date"); dt.textContent = "📅 " + fmtDate(r.receipt_date);
+    top.append(cat, dt); // category on the right, date on the left (top row)
 
     const meta = el("div", "receipt-meta");
     const who = el("span", "receipt-who");
@@ -252,8 +253,7 @@
     const dot = el("span", "pdot"); dot.style.background = partnerColor(r.partner);
     who.appendChild(dot);
     who.appendChild(document.createTextNode(partnerName(r.partner)));
-    const dt = el("span"); dt.textContent = "📅 " + fmtDate(r.receipt_date);
-    meta.append(who, dt);
+    meta.append(who);
 
     main.append(top, meta);
     if (r.note) { const note = el("div", "receipt-note"); note.textContent = r.note; main.appendChild(note); }
