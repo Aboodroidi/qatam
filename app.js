@@ -21,14 +21,16 @@
   const partnerName = (id) => (PARTNERS.find((p) => p.id === id) || {}).name || id;
   const categoryName = (id) => (CATEGORIES.find((c) => c.id === id) || {}).name || id;
 
-  const nf = new Intl.NumberFormat("ar-EG", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  // Western digits with thousands separators for clarity (3,380).
+  const nf = new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   const fmtMoney = (n) => nf.format(Number(n) || 0);
 
   function fmtDate(iso) {
     if (!iso) return "";
     const d = new Date(iso + "T00:00:00");
     if (isNaN(d)) return iso;
-    return new Intl.DateTimeFormat("ar-EG", { day: "numeric", month: "long", year: "numeric" }).format(d);
+    // Arabic month names, Western digits — e.g. "15 يوليو 2026"
+    return new Intl.DateTimeFormat("ar-u-nu-latn", { day: "numeric", month: "long", year: "numeric" }).format(d);
   }
   function todayISO() {
     const d = new Date();
@@ -456,7 +458,7 @@
 
   function donutSVG(segments, centerTop, centerBottom) {
     const total = segments.reduce((s, x) => s + x.value, 0) || 1;
-    const r = 62, C = 2 * Math.PI * r, cx = 85, cy = 85, sw = 26;
+    const r = 62, C = 2 * Math.PI * r, cx = 85, cy = 85, sw = 32;
     let acc = 0, arcs = "";
     segments.forEach((seg) => {
       const f = seg.value / total;
@@ -470,10 +472,10 @@
       `<svg class="donut" viewBox="0 0 170 170" role="img">` +
       `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="${sw}" />` +
       arcs +
-      `<text x="${cx}" y="${cy - 4}" text-anchor="middle" class="donut-center" ` +
-      `fill="var(--text)" font-size="20">${svgEl(centerTop)}</text>` +
-      `<text x="${cx}" y="${cy + 15}" text-anchor="middle" fill="var(--muted)" ` +
-      `font-size="11" font-weight="600">${svgEl(centerBottom)}</text>` +
+      `<text x="${cx}" y="${cy - 3}" text-anchor="middle" class="donut-center" ` +
+      `fill="var(--text)" font-size="23" font-weight="800">${svgEl(centerTop)}</text>` +
+      `<text x="${cx}" y="${cy + 16}" text-anchor="middle" fill="var(--muted)" ` +
+      `font-size="12" font-weight="700">${svgEl(centerBottom)}</text>` +
       `</svg>`
     );
   }

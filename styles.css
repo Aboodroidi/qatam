@@ -41,6 +41,17 @@ body {
   line-height: 1.5;
 }
 
+/* Money & figures: aligned, evenly-spaced digits */
+.tc-value, .tc-count, .dstat .dval, .hbar-val, .legend-val, .legend-pct,
+.mbar-val, .receipt-amount, .balance-note b, .balance-bar > span, .mbar-label {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+/* keep amount + currency on one line, digits left-to-right */
+.tc-value, .dstat .dval, .receipt-amount, .hbar-val {
+  unicode-bidi: plaintext;
+}
+
 .hidden { display: none !important; }
 
 code {
@@ -318,7 +329,7 @@ code {
 
 /* donut + legend */
 .donut-wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-.donut { width: 170px; height: 170px; flex: none; }
+.donut { width: 190px; height: 190px; flex: none; }
 .donut-center { font-weight: 800; }
 .legend { display: grid; gap: 8px; flex: 1; min-width: 180px; }
 .legend-row { display: grid; grid-template-columns: 14px 1fr auto auto; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
@@ -328,11 +339,11 @@ code {
 .legend-pct { color: var(--muted); font-weight: 700; min-width: 38px; text-align: left; }
 
 /* monthly bars */
-.mbars { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding-top: 10px; overflow-x: auto; }
-.mbar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; flex: 1; min-width: 42px; height: 100%; }
-.mbar-fill { width: 60%; max-width: 34px; background: linear-gradient(180deg, var(--brand), var(--brand-dark)); border-radius: 6px 6px 0 0; min-height: 3px; transition: height .5s ease; }
-.mbar-val { font-size: 11px; font-weight: 800; }
-.mbar-label { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.mbars { display: flex; align-items: flex-end; gap: 10px; height: 180px; padding-top: 14px; overflow-x: auto; }
+.mbar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 7px; flex: 1; min-width: 46px; height: 100%; }
+.mbar-fill { width: 66%; max-width: 38px; background: linear-gradient(180deg, var(--brand), var(--brand-dark)); border-radius: 7px 7px 0 0; min-height: 3px; transition: height .5s ease; }
+.mbar-val { font-size: 12.5px; font-weight: 800; }
+.mbar-label { font-size: 12px; color: var(--muted); font-weight: 700; white-space: nowrap; }
 
 .demo-badge {
   background: #fff3cd; color: #7a5c00; border: 1px solid #ecd98a;

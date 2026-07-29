@@ -10,7 +10,7 @@ window.QATAM_CONFIG = {
   SUPABASE_ANON_KEY: "sb_publishable_AmQ2dX8050xHnA27dO6-6g_3N0P4uZe",  // المفتاح العام (publishable)
 
   // عملة المزرعة (تظهر بجانب المبالغ)
-  CURRENCY: "ريال",
+  CURRENCY: "ر.ع.",
 
   // اسم المزرعة (يظهر في الأعلى)
   FARM_NAME: "قتم لإنتاج الزيتون والفستق",
