@@ -47,10 +47,33 @@
     : null;
 
   // ---------- State ----------
+  const DEMO_MODE = /[?&]demo/.test(location.search);
   let currentUser = localStorage.getItem("qatam_user") || null;
   let receipts = [];
   let filterPartner = "all";
   let filterCategory = "all";
+
+  // Chart colour palette (legible on light & dark)
+  const PALETTE = [
+    "#2f7d4f", "#c9a24b", "#4a90d9", "#d16b54", "#7a5ea8",
+    "#3fae9c", "#d98cb3", "#8a9a3b", "#c77d3a", "#5d7a8c",
+    "#9b59b6", "#16a085", "#e67e22", "#607d8b",
+  ];
+
+  // Sample data for previewing the dashboard without Supabase (?demo=1).
+  // These are fictional numbers — NOT the farm's real figures.
+  const DEMO_DATA = [
+    { partner: "abo_abdullah",    amount: 1200, category: "official_fees", receipt_date: "2024-09-08", note: "عينة" },
+    { partner: "abo_abdulrahman", amount: 300,  category: "survey",        receipt_date: "2024-10-17", note: "عينة" },
+    { partner: "abo_abdullah",    amount: 450,  category: "legal",         receipt_date: "2025-10-25", note: "عينة" },
+    { partner: "abo_abdullah",    amount: 800,  category: "survey",        receipt_date: "2025-12-17", note: "عينة" },
+    { partner: "abo_abdullah",    amount: 150,  category: "development",   receipt_date: "2025-12-20", note: "عينة" },
+    { partner: "abo_abdulrahman", amount: 250,  category: "registration",  receipt_date: "2026-05-12", note: "عينة" },
+    { partner: "abo_abdullah",    amount: 600,  category: "roadworks",     receipt_date: "2026-07-15", note: "عينة" },
+    { partner: "abo_abdulrahman", amount: 500,  category: "seeds",         receipt_date: "2026-08-03", note: "عينة" },
+    { partner: "abo_abdullah",    amount: 320,  category: "fuel",          receipt_date: "2026-08-20", note: "عينة" },
+    { partner: "abo_abdulrahman", amount: 700,  category: "labor",         receipt_date: "2026-09-10", note: "عينة" },
+  ].map((r, i) => ({ id: "demo-" + i, ...r }));
 
   // ---------- Brand names ----------
   if (CFG.FARM_NAME) {
@@ -220,6 +243,13 @@
 
   // ---------- Data ----------
   async function loadReceipts() {
+    if (DEMO_MODE) {
+      $("#loading-state").classList.add("hidden");
+      receipts = DEMO_DATA.slice();
+      renderTotals();
+      renderList();
+      return;
+    }
     if (!sb) { $("#loading-state").classList.add("hidden"); return; }
     const { data, error } = await sb
       .from("receipts")
@@ -412,8 +442,175 @@
     if (e.key === "Escape") { closeModal(); $("#lightbox").classList.add("hidden"); }
   });
 
+  // ---------- Dashboard ----------
+  $("#dash-btn").onclick = openDashboard;
+  $("#dash-close").onclick = () => $("#dashboard").classList.add("hidden");
+
+  function openDashboard() {
+    renderDashboard();
+    $("#dashboard").classList.remove("hidden");
+    $("#dashboard").scrollTop = 0;
+  }
+
+  function svgEl(v) { return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  function donutSVG(segments, centerTop, centerBottom) {
+    const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+    const r = 62, C = 2 * Math.PI * r, cx = 85, cy = 85, sw = 26;
+    let acc = 0, arcs = "";
+    segments.forEach((seg) => {
+      const f = seg.value / total;
+      arcs +=
+        `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${seg.color}" ` +
+        `stroke-width="${sw}" stroke-dasharray="${f * C} ${C}" ` +
+        `stroke-dashoffset="${-acc * C}" transform="rotate(-90 ${cx} ${cy})" />`;
+      acc += f;
+    });
+    return (
+      `<svg class="donut" viewBox="0 0 170 170" role="img">` +
+      `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="${sw}" />` +
+      arcs +
+      `<text x="${cx}" y="${cy - 4}" text-anchor="middle" class="donut-center" ` +
+      `fill="var(--text)" font-size="20">${svgEl(centerTop)}</text>` +
+      `<text x="${cx}" y="${cy + 15}" text-anchor="middle" fill="var(--muted)" ` +
+      `font-size="11" font-weight="600">${svgEl(centerBottom)}</text>` +
+      `</svg>`
+    );
+  }
+
+  function renderDashboard() {
+    const body = $("#dash-body");
+    const rows = receipts;
+
+    if (!rows.length) {
+      body.innerHTML =
+        (DEMO_MODE ? "" : "") +
+        `<div class="dash-empty">🧾 لا توجد بيانات بعد.<br>أضف إيصالات لعرض الرسوم البيانية.</div>`;
+      return;
+    }
+
+    // ---- aggregates ----
+    const total = rows.reduce((s, r) => s + Number(r.amount), 0);
+    const count = rows.length;
+    const avg = total / count;
+
+    const perPartner = PARTNERS.map((p) => ({
+      id: p.id, name: p.name,
+      sum: rows.filter((r) => r.partner === p.id).reduce((s, r) => s + Number(r.amount), 0),
+    }));
+
+    const catMap = {};
+    rows.forEach((r) => { catMap[r.category] = (catMap[r.category] || 0) + Number(r.amount); });
+    const perCategory = Object.keys(catMap)
+      .map((id) => ({ id, name: categoryName(id), sum: catMap[id] }))
+      .sort((a, b) => b.sum - a.sum);
+
+    const monMap = {};
+    rows.forEach((r) => {
+      const m = (r.receipt_date || "").slice(0, 7);
+      if (m) monMap[m] = (monMap[m] || 0) + Number(r.amount);
+    });
+    const perMonth = Object.keys(monMap).sort().map((m) => ({ m, sum: monMap[m] }));
+
+    const cur = CURRENCY;
+    const money = (n) => `${fmtMoney(n)}<span class="cur"> ${cur}</span>`;
+
+    // ---- balance ----
+    const p0 = perPartner[0], p1 = perPartner[1] || { name: "", sum: 0 };
+    const diff = Math.abs(p0.sum - p1.sum);
+    const moreName = p0.sum >= p1.sum ? p0.name : p1.name;
+    const w0 = total ? (p0.sum / total) * 100 : 50;
+    const w1 = 100 - w0;
+
+    // ---- category colors ----
+    perCategory.forEach((c, i) => (c.color = PALETTE[i % PALETTE.length]));
+    const partnerColors = ["#2f7d4f", "#c9a24b"];
+
+    let html = "";
+
+    if (DEMO_MODE) {
+      html += `<div class="demo-badge">⚠️ وضع العرض التجريبي — الأرقام هنا وهمية للتوضيح فقط.</div>`;
+    }
+
+    // stat cards
+    html +=
+      `<div class="dash-grid3">` +
+      `<div class="dcard dstat"><div class="dlabel">الإجمالي الكلي</div><div class="dval">${money(total)}</div></div>` +
+      `<div class="dcard dstat"><div class="dlabel">عدد الإيصالات</div><div class="dval">${count}</div></div>` +
+      `<div class="dcard dstat"><div class="dlabel">متوسط الإيصال</div><div class="dval">${money(Math.round(avg))}</div></div>` +
+      `</div>`;
+
+    // balance
+    html +=
+      `<div class="dcard"><h3>التوازن بين الشريكين</h3>` +
+      `<div class="balance-bar">` +
+      `<span style="width:${w0}%;background:${partnerColors[0]}">${Math.round(w0)}%</span>` +
+      `<span style="width:${w1}%;background:${partnerColors[1]}">${Math.round(w1)}%</span>` +
+      `</div>` +
+      `<div class="balance-note">` +
+      (diff === 0
+        ? "الشريكان متساويان في المصروفات ✅"
+        : `<span class="up">${svgEl(moreName)}</span> دفع أكثر بمقدار <b>${fmtMoney(diff)} ${cur}</b>`) +
+      `</div></div>`;
+
+    // per partner bars
+    const maxP = Math.max(...perPartner.map((p) => p.sum), 1);
+    html += `<div class="dcard"><h3>المصروفات حسب الشريك</h3>`;
+    perPartner.forEach((p, i) => {
+      html +=
+        `<div class="hbar-row">` +
+        `<div class="hbar-name">${svgEl(p.name)}</div>` +
+        `<div class="hbar-track"><div class="hbar-fill" style="width:${(p.sum / maxP) * 100}%;background:${partnerColors[i % 2]}"></div></div>` +
+        `<div class="hbar-val">${money(p.sum)}</div>` +
+        `</div>`;
+    });
+    html += `</div>`;
+
+    // category donut + legend
+    html += `<div class="dcard"><h3>المصروفات حسب الفئة</h3><div class="donut-wrap">`;
+    html += donutSVG(
+      perCategory.map((c) => ({ value: c.sum, color: c.color })),
+      fmtMoney(total),
+      cur
+    );
+    html += `<div class="legend">`;
+    perCategory.forEach((c) => {
+      const pct = total ? Math.round((c.sum / total) * 100) : 0;
+      html +=
+        `<div class="legend-row">` +
+        `<span class="legend-dot" style="background:${c.color}"></span>` +
+        `<span class="legend-name">${svgEl(c.name)}</span>` +
+        `<span class="legend-val">${money(c.sum)}</span>` +
+        `<span class="legend-pct">${pct}%</span>` +
+        `</div>`;
+    });
+    html += `</div></div></div>`;
+
+    // monthly bars
+    if (perMonth.length) {
+      const maxM = Math.max(...perMonth.map((x) => x.sum), 1);
+      html += `<div class="dcard"><h3>المصروفات عبر الأشهر</h3><div class="mbars">`;
+      perMonth.forEach((x) => {
+        const [y, mo] = x.m.split("-");
+        html +=
+          `<div class="mbar" title="${x.m}">` +
+          `<div class="mbar-val">${fmtMoney(x.sum)}</div>` +
+          `<div class="mbar-fill" style="height:${(x.sum / maxM) * 100}%"></div>` +
+          `<div class="mbar-label">${Number(mo)}/${y}</div>` +
+          `</div>`;
+      });
+      html += `</div></div>`;
+    }
+
+    body.innerHTML = html;
+  }
+
   // ---------- Boot ----------
-  if (currentUser && PARTNERS.some((p) => p.id === currentUser)) {
+  if (DEMO_MODE) {
+    if (!currentUser || !PARTNERS.some((p) => p.id === currentUser)) currentUser = PARTNERS[0].id;
+    $("#setup-banner").classList.add("hidden");
+    showApp();
+  } else if (currentUser && PARTNERS.some((p) => p.id === currentUser)) {
     showApp();
   } else {
     showWho();

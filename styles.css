@@ -258,6 +258,88 @@ code {
 }
 .empty-emoji { font-size: 46px; margin-bottom: 10px; }
 
+/* ---------- Header actions / dashboard button ---------- */
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.dash-btn-header {
+  font-family: inherit; font-weight: 800; font-size: 13.5px;
+  color: #fff; background: var(--brand);
+  border: none; padding: 8px 14px; border-radius: 999px;
+  cursor: pointer; white-space: nowrap;
+}
+.dash-btn-header:hover { background: var(--brand-dark); }
+@media (max-width: 560px) {
+  .dash-btn-header { font-size: 0; padding: 9px 11px; }
+  .dash-btn-header::before { content: "📊"; font-size: 16px; }
+}
+
+/* ---------- Dashboard ---------- */
+.dashboard {
+  position: fixed; inset: 0; z-index: 60;
+  background: var(--bg); overflow-y: auto;
+}
+.dash-head {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.dash-head-inner {
+  max-width: 960px; margin: 0 auto; padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.dash-head-inner h2 { margin: 0; font-size: 18px; font-weight: 800; }
+.dash-close { flex: none; padding: 9px 16px; }
+.dash-body { max-width: 960px; margin: 0 auto; padding: 20px 18px 60px; display: grid; gap: 18px; }
+
+.dash-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 560px) { .dash-grid3 { grid-template-columns: 1fr; } }
+
+.dcard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow);
+}
+.dcard h3 { margin: 0 0 14px; font-size: 15px; font-weight: 800; }
+.dstat .dlabel { font-size: 13px; color: var(--muted); font-weight: 600; }
+.dstat .dval { font-size: clamp(20px, 6vw, 28px); font-weight: 800; margin-top: 4px; }
+.dstat .dval .cur { font-size: 13px; color: var(--muted); margin-inline-start: 4px; }
+
+/* balance bar */
+.balance-bar { display: flex; height: 26px; border-radius: 8px; overflow: hidden; margin: 10px 0 8px; }
+.balance-bar > span { display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 800; color: #fff; min-width: 34px; }
+.balance-note { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.balance-note .up { color: var(--brand-dark); }
+
+/* horizontal bars */
+.hbar-row { display: grid; grid-template-columns: 120px 1fr auto; align-items: center; gap: 10px; margin-bottom: 12px; }
+.hbar-row:last-child { margin-bottom: 0; }
+.hbar-name { font-size: 13.5px; font-weight: 700; }
+.hbar-track { background: var(--surface-2); border-radius: 8px; height: 22px; overflow: hidden; }
+.hbar-fill { height: 100%; border-radius: 8px; min-width: 3px; transition: width .5s ease; }
+.hbar-val { font-size: 13px; font-weight: 800; white-space: nowrap; }
+@media (max-width: 480px) { .hbar-row { grid-template-columns: 90px 1fr auto; } }
+
+/* donut + legend */
+.donut-wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.donut { width: 170px; height: 170px; flex: none; }
+.donut-center { font-weight: 800; }
+.legend { display: grid; gap: 8px; flex: 1; min-width: 180px; }
+.legend-row { display: grid; grid-template-columns: 14px 1fr auto auto; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+.legend-name { color: var(--text); }
+.legend-val { font-weight: 800; }
+.legend-pct { color: var(--muted); font-weight: 700; min-width: 38px; text-align: left; }
+
+/* monthly bars */
+.mbars { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding-top: 10px; overflow-x: auto; }
+.mbar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; flex: 1; min-width: 42px; height: 100%; }
+.mbar-fill { width: 60%; max-width: 34px; background: linear-gradient(180deg, var(--brand), var(--brand-dark)); border-radius: 6px 6px 0 0; min-height: 3px; transition: height .5s ease; }
+.mbar-val { font-size: 11px; font-weight: 800; }
+.mbar-label { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+.demo-badge {
+  background: #fff3cd; color: #7a5c00; border: 1px solid #ecd98a;
+  padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; text-align: center;
+}
+.dash-empty { text-align: center; color: var(--muted); padding: 50px 20px; font-weight: 600; }
+
 /* ---------- Modal ---------- */
 .modal, .lightbox {
   position: fixed; inset: 0; z-index: 100;

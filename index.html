@@ -19,7 +19,7 @@
   <div id="who-screen" class="who-screen hidden">
     <div class="who-card">
       <div class="who-logo">🌾</div>
-      <h1 id="who-farm-name">مزرعة قطم</h1>
+      <h1 id="who-farm-name">قتم لإنتاج الزيتون والفستق</h1>
       <p class="who-sub">من أنت؟</p>
       <div id="who-buttons" class="who-buttons"></div>
     </div>
@@ -32,11 +32,14 @@
         <div class="brand">
           <span class="brand-logo">🌾</span>
           <div>
-            <h1 id="farm-name">مزرعة قطم</h1>
+            <h1 id="farm-name">قتم لإنتاج الزيتون والفستق</h1>
             <span class="brand-sub">سجل حسابات المزرعة</span>
           </div>
         </div>
-        <button id="who-pill" class="who-pill" title="تغيير المستخدم"></button>
+        <div class="header-actions">
+          <button id="dash-btn" class="dash-btn-header" title="لوحة المعلومات">📊 لوحة المعلومات</button>
+          <button id="who-pill" class="who-pill" title="تغيير المستخدم"></button>
+        </div>
       </div>
     </header>
 
@@ -61,6 +64,17 @@
       </div>
       <div id="loading-state" class="loading-state">جارٍ التحميل…</div>
     </main>
+  </div>
+
+  <!-- لوحة المعلومات -->
+  <div id="dashboard" class="dashboard hidden">
+    <header class="dash-head">
+      <div class="dash-head-inner">
+        <h2>📊 لوحة معلومات المصروفات</h2>
+        <button id="dash-close" class="btn-ghost dash-close">← رجوع</button>
+      </div>
+    </header>
+    <div id="dash-body" class="dash-body"></div>
   </div>
 
   <!-- نافذة إضافة إيصال -->
