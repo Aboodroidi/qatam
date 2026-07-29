@@ -32,6 +32,14 @@
     // Arabic month names, Western digits — e.g. "15 يوليو 2026"
     return new Intl.DateTimeFormat("ar-u-nu-latn", { day: "numeric", month: "long", year: "numeric" }).format(d);
   }
+
+  // Official Omani Rial symbol (Central Bank of Oman guideline). Scalable
+  // vector that inherits the text colour; placed to the LEFT of the numeral.
+  const RIAL_PATH = "M 60.05 261.94 L 98.55 192.21 L 230.20 191.90 C 228.88 142.98 247.16 83.29 279.20 45.75 C 318.23 0.00 376.41 22.47 415.27 55.84 C 420.17 60.04 434.50 72.86 434.29 78.52 L 408.30 177.87 C 377.58 143.70 338.13 105.87 287.70 114.30 C 278.21 115.89 265.40 124.91 260.51 133.13 C 248.36 153.56 273.55 178.35 287.23 191.89 L 656.01 191.89 L 617.18 261.94 L 356.08 261.94 C 367.28 271.51 383.15 280.37 396.75 286.32 C 403.88 289.45 431.12 299.97 437.15 299.97 L 596.10 299.97 L 557.27 370.03 L 0.00 370.03 L 39.03 299.97 L 284.23 299.97 L 256.20 261.94 Z M 60.05 261.94";
+  const RIAL_SVG = `<svg class="omr" viewBox="0 0 656 370" role="img" aria-label="ريال عماني"><path d="${RIAL_PATH}"/></svg>`;
+  // symbol + number (symbol on the left, with a gap) — container needs class "money"
+  function moneyInner(n) { return `<span class="omr-wrap">${RIAL_SVG}</span><span class="amt">${fmtMoney(n)}</span>`; }
+  function moneyHTML(n) { return `<span class="money">${moneyInner(n)}</span>`; }
   function todayISO() {
     const d = new Date();
     const off = d.getTimezoneOffset();
@@ -181,9 +189,8 @@
   function totalCard(label, value, count, grand) {
     const c = el("div", "total-card" + (grand ? " grand" : ""));
     const l = el("div", "tc-label"); l.textContent = label;
-    const v = el("div", "tc-value");
-    v.textContent = fmtMoney(value);
-    const cur = el("span", "tc-cur"); cur.textContent = CURRENCY; v.appendChild(cur);
+    const v = el("div", "tc-value money");
+    v.innerHTML = moneyInner(value);
     const cnt = el("div", "tc-count"); cnt.textContent = count + " إيصال";
     c.append(l, v, cnt);
     return c;
@@ -220,9 +227,8 @@
 
     const main = el("div", "receipt-main");
     const top = el("div", "receipt-top");
-    const amt = el("div", "receipt-amount");
-    amt.textContent = fmtMoney(r.amount);
-    const cur = el("span", "cur"); cur.textContent = CURRENCY; amt.appendChild(cur);
+    const amt = el("div", "receipt-amount money");
+    amt.innerHTML = moneyInner(r.amount);
     const cat = el("span", "receipt-cat"); cat.textContent = categoryName(r.category);
     top.append(amt, cat);
 
@@ -456,7 +462,7 @@
 
   function svgEl(v) { return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
 
-  function donutSVG(segments, centerTop, centerBottom) {
+  function donutSVG(segments, centerTop) {
     const total = segments.reduce((s, x) => s + x.value, 0) || 1;
     const r = 62, C = 2 * Math.PI * r, cx = 85, cy = 85, sw = 32;
     let acc = 0, arcs = "";
@@ -472,10 +478,10 @@
       `<svg class="donut" viewBox="0 0 170 170" role="img">` +
       `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="${sw}" />` +
       arcs +
-      `<text x="${cx}" y="${cy - 3}" text-anchor="middle" class="donut-center" ` +
+      `<text x="${cx}" y="${cy - 2}" text-anchor="middle" class="donut-center" ` +
       `fill="var(--text)" font-size="23" font-weight="800">${svgEl(centerTop)}</text>` +
-      `<text x="${cx}" y="${cy + 16}" text-anchor="middle" fill="var(--muted)" ` +
-      `font-size="12" font-weight="700">${svgEl(centerBottom)}</text>` +
+      `<g transform="translate(${cx - 15} ${cy + 6}) scale(0.0457)">` +
+      `<path d="${RIAL_PATH}" fill="var(--muted)"/></g>` +
       `</svg>`
     );
   }
@@ -514,8 +520,7 @@
     });
     const perMonth = Object.keys(monMap).sort().map((m) => ({ m, sum: monMap[m] }));
 
-    const cur = CURRENCY;
-    const money = (n) => `${fmtMoney(n)}<span class="cur"> ${cur}</span>`;
+    const money = (n) => moneyHTML(n);
 
     // ---- balance ----
     const p0 = perPartner[0], p1 = perPartner[1] || { name: "", sum: 0 };
@@ -552,7 +557,7 @@
       `<div class="balance-note">` +
       (diff === 0
         ? "الشريكان متساويان في المصروفات ✅"
-        : `<span class="up">${svgEl(moreName)}</span> دفع أكثر بمقدار <b>${fmtMoney(diff)} ${cur}</b>`) +
+        : `<span class="up">${svgEl(moreName)}</span> دفع أكثر بمقدار <b class="money">${moneyInner(diff)}</b>`) +
       `</div></div>`;
 
     // per partner bars
@@ -572,8 +577,7 @@
     html += `<div class="dcard"><h3>المصروفات حسب الفئة</h3><div class="donut-wrap">`;
     html += donutSVG(
       perCategory.map((c) => ({ value: c.sum, color: c.color })),
-      fmtMoney(total),
-      cur
+      fmtMoney(total)
     );
     html += `<div class="legend">`;
     perCategory.forEach((c) => {

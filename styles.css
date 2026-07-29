@@ -43,13 +43,25 @@ body {
 
 /* Money & figures: aligned, evenly-spaced digits */
 .tc-value, .tc-count, .dstat .dval, .hbar-val, .legend-val, .legend-pct,
-.mbar-val, .receipt-amount, .balance-note b, .balance-bar > span, .mbar-label {
+.mbar-val, .receipt-amount, .balance-note b, .balance-bar > span, .mbar-label, .amt {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
-/* keep amount + currency on one line, digits left-to-right */
-.tc-value, .dstat .dval, .receipt-amount, .hbar-val {
-  unicode-bidi: plaintext;
+
+/* Official Omani Rial symbol placed to the LEFT of the number (CBO guideline) */
+.money {
+  display: inline-flex;
+  align-items: center;
+  direction: ltr;
+  unicode-bidi: isolate;
+  gap: 0.32em;
+}
+.omr-wrap { display: inline-flex; align-items: center; }
+.omr {
+  height: 0.66em;      /* aligned to the digit height */
+  width: auto;
+  fill: currentColor;  /* inherits the surrounding text colour */
+  display: block;
 }
 
 .hidden { display: none !important; }
