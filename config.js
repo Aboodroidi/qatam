@@ -15,10 +15,10 @@ window.QATAM_CONFIG = {
   // اسم المزرعة (يظهر في الأعلى)
   FARM_NAME: "قتم لإنتاج الزيتون والفستق",
 
-  // الشريكان
+  // الشريكان (لكل شريك لون مميّز لتسهيل التمييز)
   PARTNERS: [
-    { id: "abo_abdulrahman", name: "أبو عبدالرحمن" },
-    { id: "abo_abdullah", name: "أبو عبدالله" },
+    { id: "abo_abdulrahman", name: "أبو عبدالرحمن", color: "#d99a3c" }, // كهرماني
+    { id: "abo_abdullah", name: "أبو عبدالله", color: "#4a90d9" },       // أزرق
   ],
 
   // فئات المصاريف

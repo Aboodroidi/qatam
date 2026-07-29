@@ -117,16 +117,21 @@ code {
   padding: 16px;
   border-radius: 14px;
   border: 1.5px solid var(--border);
+  border-inline-start: 5px solid var(--pc, var(--border));
   background: var(--surface-2);
   color: var(--text);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   transition: transform .12s ease, border-color .12s ease, background .12s ease;
 }
 .who-buttons button:hover {
-  border-color: var(--brand);
-  background: var(--brand-soft);
+  border-color: var(--pc, var(--brand));
   transform: translateY(-2px);
 }
+.who-buttons .pdot { width: 12px; height: 12px; }
 
 /* ---------- Header ---------- */
 .app-header {
@@ -151,17 +156,19 @@ code {
 .brand-sub { color: var(--muted); font-size: 12.5px; font-weight: 600; }
 .who-pill {
   font-family: inherit;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13.5px;
   color: var(--brand-dark);
-  background: var(--brand-soft);
-  border: 1px solid transparent;
+  background: var(--surface-2);
+  border: 1.5px solid transparent;
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
-.who-pill:hover { border-color: var(--brand); }
 
 /* ---------- Container ---------- */
 .container { max-width: 900px; margin: 0 auto; padding: 20px 18px 60px; }
@@ -177,15 +184,24 @@ code {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 16px 16px 14px;
   box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
+.total-card:hover { transform: translateY(-2px); }
+/* colour-code each partner card with a top accent + coloured name */
+.total-card:not(.grand) { border-top: 4px solid var(--pc, var(--border)); }
+.total-card:not(.grand) .tc-label { color: var(--pc, var(--muted)); opacity: 1; }
+/* selected-as-filter state */
+.total-card.active:not(.grand) { border-color: var(--pc); box-shadow: 0 0 0 2px var(--pc), var(--shadow); }
+.total-card.grand.active { outline: 2px solid rgba(255,255,255,.75); outline-offset: -4px; }
 .total-card.grand {
   background: linear-gradient(135deg, var(--brand), var(--brand-dark));
   border-color: transparent;
   color: #fff;
 }
-.total-card .tc-label { font-size: 13px; font-weight: 600; opacity: .85; margin-bottom: 6px; }
+.total-card .tc-label { font-size: 13px; font-weight: 700; opacity: .85; margin-bottom: 6px; }
 .total-card .tc-value { font-size: clamp(18px, 5vw, 26px); font-weight: 800; letter-spacing: -0.5px; }
 .total-card .tc-cur { font-size: 13px; font-weight: 600; opacity: .8; margin-inline-start: 4px; }
 .total-card .tc-count { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 600; }
@@ -275,6 +291,8 @@ code {
   padding: 3px 10px; border-radius: 999px;
 }
 .receipt-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.receipt-who { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; }
+.pdot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
 .receipt-note { margin-top: 4px; font-size: 13px; color: var(--text); opacity: .85; }
 .receipt-del {
   border: none; background: transparent; color: var(--muted);

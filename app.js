@@ -19,6 +19,7 @@
     return n;
   };
   const partnerName = (id) => (PARTNERS.find((p) => p.id === id) || {}).name || id;
+  const partnerColor = (id) => (PARTNERS.find((p) => p.id === id) || {}).color || "var(--brand)";
   const categoryName = (id) => (CATEGORIES.find((c) => c.id === id) || {}).name || id;
 
   // Western digits with thousands separators for clarity (3,380).
@@ -97,7 +98,10 @@
     wrap.innerHTML = "";
     PARTNERS.forEach((p) => {
       const b = el("button");
-      b.textContent = p.name;
+      b.style.setProperty("--pc", p.color || "var(--brand)");
+      const dot = el("span", "pdot"); dot.style.background = p.color || "var(--brand)";
+      b.appendChild(dot);
+      b.appendChild(document.createTextNode(p.name));
       b.onclick = () => setUser(p.id);
       wrap.appendChild(b);
     });
@@ -118,7 +122,12 @@
     $("#who-screen").classList.add("hidden");
     $("#app").classList.remove("hidden");
     const pill = $("#who-pill");
-    pill.textContent = "👤 " + partnerName(currentUser);
+    pill.innerHTML = "";
+    const pdot = el("span", "pdot"); pdot.style.background = partnerColor(currentUser);
+    pill.appendChild(pdot);
+    pill.appendChild(document.createTextNode(partnerName(currentUser)));
+    pill.style.color = partnerColor(currentUser);
+    pill.style.borderColor = partnerColor(currentUser);
     pill.onclick = showWho;
     buildFormOptions();
     buildFilters();
@@ -148,16 +157,7 @@
 
   // ---------- Filters ----------
   function buildFilters() {
-    const pf = $("#filter-partner");
-    pf.innerHTML = "";
-    const partnerOpts = [{ id: "all", name: "الكل" }, ...PARTNERS];
-    partnerOpts.forEach((p) => {
-      const chip = el("button", "chip" + (filterPartner === p.id ? " active" : ""));
-      chip.textContent = p.name;
-      chip.onclick = () => { filterPartner = p.id; buildFilters(); renderList(); };
-      pf.appendChild(chip);
-    });
-
+    // Partner filtering is done by clicking the total cards (see renderTotals).
     const cf = $("#filter-category");
     cf.innerHTML = "";
     const catOpts = [{ id: "all", name: "كل الفئات" }, ...CATEGORIES];
@@ -182,17 +182,31 @@
     });
 
     PARTNERS.forEach((p) => {
-      wrap.appendChild(totalCard(p.name, totals[p.id].sum, totals[p.id].count, false));
+      wrap.appendChild(totalCard(p.name, totals[p.id].sum, totals[p.id].count, { partner: p.id, color: partnerColor(p.id) }));
     });
-    wrap.appendChild(totalCard("الإجمالي الكلي", grand, grandCount, true));
+    wrap.appendChild(totalCard("الإجمالي الكلي", grand, grandCount, { partner: "all", grand: true }));
   }
-  function totalCard(label, value, count, grand) {
-    const c = el("div", "total-card" + (grand ? " grand" : ""));
+  function setPartnerFilter(id) {
+    filterPartner = id;
+    renderTotals();
+    renderList();
+  }
+  function totalCard(label, value, count, opts) {
+    const active = filterPartner === opts.partner;
+    const c = el("div", "total-card" + (opts.grand ? " grand" : "") + (active ? " active" : ""));
+    if (opts.color) c.style.setProperty("--pc", opts.color);
+    c.dataset.partner = opts.partner;
     const l = el("div", "tc-label"); l.textContent = label;
     const v = el("div", "tc-value money");
     v.innerHTML = moneyInner(value);
     const cnt = el("div", "tc-count"); cnt.textContent = count + " إيصال";
     c.append(l, v, cnt);
+    // Clicking a card filters by that partner; clicking the active one (or the
+    // grand-total card) shows everyone again.
+    c.onclick = () => {
+      const next = opts.partner !== "all" && filterPartner === opts.partner ? "all" : opts.partner;
+      setPartnerFilter(next);
+    };
     return c;
   }
 
@@ -233,7 +247,11 @@
     top.append(cat);
 
     const meta = el("div", "receipt-meta");
-    const who = el("span"); who.textContent = "👤 " + partnerName(r.partner);
+    const who = el("span", "receipt-who");
+    who.style.color = partnerColor(r.partner);
+    const dot = el("span", "pdot"); dot.style.background = partnerColor(r.partner);
+    who.appendChild(dot);
+    who.appendChild(document.createTextNode(partnerName(r.partner)));
     const dt = el("span"); dt.textContent = "📅 " + fmtDate(r.receipt_date);
     meta.append(who, dt);
 
@@ -531,7 +549,7 @@
 
     // ---- category colors ----
     perCategory.forEach((c, i) => (c.color = PALETTE[i % PALETTE.length]));
-    const partnerColors = ["#2f7d4f", "#c9a24b"];
+    const partnerColors = PARTNERS.map((p) => partnerColor(p.id));
 
     let html = "";
 
