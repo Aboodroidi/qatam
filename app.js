@@ -214,23 +214,23 @@
   function receiptRow(r) {
     const row = el("div", "receipt");
 
+    // Amount takes the leading spot (where the receipt icon used to be).
+    const amt = el("div", "receipt-amount");
+    amt.innerHTML = moneyHTML(r.amount);
+    row.appendChild(amt);
+
+    // Keep a small thumbnail only when a real receipt photo exists.
     if (r.photo_url) {
       const img = el("img", "receipt-thumb");
       img.src = r.photo_url; img.alt = "إيصال"; img.loading = "lazy";
       img.onclick = () => openLightbox(r.photo_url);
       row.appendChild(img);
-    } else {
-      const ph = el("div", "receipt-thumb placeholder");
-      ph.textContent = "🧾";
-      row.appendChild(ph);
     }
 
     const main = el("div", "receipt-main");
     const top = el("div", "receipt-top");
-    const amt = el("div", "receipt-amount money");
-    amt.innerHTML = moneyInner(r.amount);
     const cat = el("span", "receipt-cat"); cat.textContent = categoryName(r.category);
-    top.append(amt, cat);
+    top.append(cat);
 
     const meta = el("div", "receipt-meta");
     const who = el("span"); who.textContent = "👤 " + partnerName(r.partner);

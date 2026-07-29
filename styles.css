@@ -258,9 +258,17 @@ code {
   font-size: 26px; cursor: default;
 }
 .receipt-main { flex: 1; min-width: 0; }
-.receipt-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.receipt-amount { font-size: 18px; font-weight: 800; white-space: nowrap; }
-.receipt-amount .cur { font-size: 12px; font-weight: 600; color: var(--muted); margin-inline-start: 3px; }
+.receipt-top { display: flex; align-items: baseline; justify-content: flex-start; gap: 8px; }
+.receipt-amount {
+  flex: none;
+  min-width: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;   /* pin to the leading edge, where the icon was */
+  font-size: 19px;
+  font-weight: 800;
+  white-space: nowrap;
+}
 .receipt-cat {
   font-size: 12px; font-weight: 700;
   background: var(--brand-soft); color: var(--brand-dark);
