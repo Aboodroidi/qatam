@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <!-- شريط تنبيه إذا لم يتم ضبط الإعدادات -->
@@ -85,11 +85,21 @@
         <button class="icon-btn" data-close>✕</button>
       </div>
       <form id="receipt-form" class="form">
-        <label class="field">
-          <span>الشريك</span>
-          <select id="f-partner" required></select>
-        </label>
+        <!-- 1) الصورة أولاً: التقاط / رفع صورة أو ملف ثم القراءة التلقائية -->
+        <div class="field">
+          <label class="upload-zone" for="f-photo">
+            <span class="upload-icon">📷</span>
+            <span class="upload-text">التقط صورة الإيصال أو ارفع صورة/ملف</span>
+            <span class="upload-sub">سيقرأها الذكاء الاصطناعي ويملأ الحقول تلقائياً</span>
+          </label>
+          <input id="f-photo" type="file" accept="image/*" class="hidden-file" />
+          <div id="analyze-status" class="analyze-status hidden"></div>
+          <div id="photo-preview" class="photo-preview hidden">
+            <img id="photo-preview-img" alt="معاينة" />
+          </div>
+        </div>
 
+        <!-- 2) الحقول (تُملأ تلقائياً بعد القراءة، وما لا يُعرف يُترك فارغاً) -->
         <div class="row">
           <label class="field">
             <span>المبلغ</span>
@@ -107,17 +117,13 @@
         </label>
 
         <label class="field">
-          <span>ملاحظة (اختياري)</span>
-          <input id="f-note" type="text" placeholder="مثال: علف أبقار" />
+          <span>الشريك (من دفع)</span>
+          <select id="f-partner" required></select>
         </label>
 
         <label class="field">
-          <span>صورة الإيصال</span>
-          <input id="f-photo" type="file" accept="image/*" capture="environment" />
-          <div id="analyze-status" class="analyze-status hidden"></div>
-          <div id="photo-preview" class="photo-preview hidden">
-            <img id="photo-preview-img" alt="معاينة" />
-          </div>
+          <span>ملاحظة (اختياري)</span>
+          <input id="f-note" type="text" placeholder="مثال: علف أبقار" />
         </label>
 
         <div id="form-error" class="form-error hidden"></div>
@@ -138,7 +144,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <script src="config.js?v=7"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

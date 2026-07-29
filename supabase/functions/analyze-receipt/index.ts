@@ -53,13 +53,15 @@ Deno.serve(async (req) => {
   const catList = categories.length
     ? categories.map((c) => `${c.id} = ${c.name}`).join("\n")
     : "other = Other";
-  const catIds = categories.length ? categories.map((c) => c.id) : ["other"];
+  // "" lets the model leave the category blank when it can't tell.
+  const catIds = ["", ...(categories.length ? categories.map((c) => c.id) : ["other"])];
 
   const prompt =
-    `هذه صورة إيصال/فاتورة مشتريات لمزرعة. استخرج المعلومات التالية بدقة:\n` +
-    `- amount: المبلغ الإجمالي النهائي المدفوع (رقم فقط).\n` +
-    `- date: تاريخ الإيصال بصيغة YYYY-MM-DD. إن لم يظهر تاريخ، استخدم "${today ?? ""}".\n` +
-    `- category: اختر أنسب فئة من القائمة التالية وأعد المُعرّف (id) فقط:\n${catList}\n` +
+    `هذه صورة إيصال/فاتورة مشتريات لمزرعة. اقرأها واستخرج المعلومات التالية.\n` +
+    `مهم جداً: إذا لم تستطع تحديد قيمة حقل بثقة، اتركه فارغاً — لا تخمّن.\n` +
+    `- amount: المبلغ الإجمالي النهائي المدفوع (رقم فقط). إن لم يظهر، أعد 0.\n` +
+    `- date: تاريخ الإيصال بصيغة YYYY-MM-DD. إن لم يظهر تاريخ، أعد "" (سلسلة فارغة).\n` +
+    `- category: اختر أنسب فئة من القائمة التالية وأعد المُعرّف (id) فقط، أو "" إن لم تتضح:\n${catList}\n` +
     `- merchant: اسم المتجر أو المورّد (نص قصير، أو "" إن لم يظهر).\n` +
     `- currency: رمز أو اسم العملة إن ظهر (أو "" إن لم يظهر).\n` +
     `الإيصال قد يكون بالعربية أو الإنجليزية.`;

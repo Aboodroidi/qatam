@@ -148,6 +148,9 @@
     });
     const cs = $("#f-category");
     cs.innerHTML = "";
+    const ph = el("option");           // blank placeholder — stays empty if the AI can't tell
+    ph.value = ""; ph.textContent = "— اختر الفئة —";
+    cs.appendChild(ph);
     CATEGORIES.forEach((c) => {
       const o = el("option");
       o.value = c.id; o.textContent = c.name;
@@ -258,12 +261,7 @@
     main.append(top, meta);
     if (r.note) { const note = el("div", "receipt-note"); note.textContent = r.note; main.appendChild(note); }
 
-    const del = el("button", "receipt-del");
-    del.textContent = "🗑";
-    del.title = "حذف";
-    del.onclick = () => deleteReceipt(r);
-
-    row.append(main, del);
+    row.append(main);
     return row;
   }
 
@@ -331,7 +329,8 @@
     if (!sb) { alert("الإعدادات غير مكتملة. راجع ملف config.js وملف README."); return; }
     $("#receipt-form").reset();
     buildFormOptions();
-    $("#f-date").value = todayISO();
+    // Start blank — the scan fills what it can read; unknowns stay empty.
+    $("#f-category").value = "";
     $("#photo-preview").classList.add("hidden");
     $("#analyze-status").classList.add("hidden");
     $("#form-error").classList.add("hidden");
