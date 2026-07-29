@@ -6,8 +6,8 @@
 
 window.QATAM_CONFIG = {
   // من Supabase → Project Settings → API
-  SUPABASE_URL: "",       // مثال: https://abcdxyz.supabase.co
-  SUPABASE_ANON_KEY: "",  // المفتاح العام (anon public)
+  SUPABASE_URL: "https://mvblslxjakzvskueciig.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_AmQ2dX8050xHnA27dO6-6g_3N0P4uZe",  // المفتاح العام (publishable)
 
   // عملة المزرعة (تظهر بجانب المبالغ)
   CURRENCY: "ريال",
