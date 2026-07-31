@@ -424,19 +424,25 @@
     btn.textContent = "جارٍ الحفظ…";
 
     try {
-      let photo_url = null, photo_path = null;
+      let photo_url = null, photo_path = null, photoFailed = false;
       if (file) {
-        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-        const rand = Math.random().toString(36).slice(2, 8);
-        photo_path = `${date}_${partner}_${rand}.${ext}`;
-        const up = await sb.storage.from(BUCKET).upload(photo_path, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.type || "image/jpeg",
-        });
-        if (up.error) throw up.error;
-        const { data: pub } = sb.storage.from(BUCKET).getPublicUrl(photo_path);
-        photo_url = pub.publicUrl;
+        try {
+          const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+          const rand = Math.random().toString(36).slice(2, 8);
+          const path = `${date}_${partner}_${rand}.${ext}`;
+          const up = await sb.storage.from(BUCKET).upload(path, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type || "image/jpeg",
+          });
+          if (up.error) throw up.error;
+          const { data: pub } = sb.storage.from(BUCKET).getPublicUrl(path);
+          photo_url = pub.publicUrl; photo_path = path;
+        } catch (upErr) {
+          // Don't lose the expense over a photo problem — save without it.
+          console.warn("photo upload failed, saving without photo:", upErr);
+          photoFailed = true; photo_url = null; photo_path = null;
+        }
       }
 
       const { error } = await sb.from("receipts").insert({
@@ -447,6 +453,7 @@
 
       closeModal();
       await reloadQuiet();
+      if (photoFailed) alert("تم حفظ الإيصال، لكن تعذّر رفع الصورة (لم يتم إعداد التخزين بعد). ستُرفع الصور بعد إنشاء مخزّن receipts.");
     } catch (err) {
       console.error(err);
       errBox.textContent = "تعذّر الحفظ: " + (err.message || err);
